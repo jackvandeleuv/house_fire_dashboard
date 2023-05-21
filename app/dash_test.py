@@ -4,19 +4,27 @@ from dash import dcc, html
 import pandas as pd
 import plotly.express as px
 
-df = pd.read_csv('multi_merged.csv', sep=',')
+WORKING_DIRECTOR = 'D:/Fire Project/'
+df = pd.read_csv('data/processed/dashboard.csv', sep=',')
+df = df[df.POPULATION.notna()]
+df = df[df['111_COUNT'].notna()]
 
-grouped_df = df.groupby('CITYSTATE').agg({'INSPECTION_SCORE': 'mean', 'INC_COUNT': 'sum', 'LATITUDE': 'mean', 'LONGITUDE': 'mean'}).reset_index()
+from sklearn.preprocessing import StandardScaler
+df['COLOR'] = df['111_COUNT'] / df.POPULATION
+df.COLOR = StandardScaler.fit_transform(df.COLOR)
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
-fig = px.scatter_geo(grouped_df, lat='LATITUDE', lon='LONGITUDE',
-                     color='INC_COUNT',
+fig = px.scatter_geo(df, lat='LATITUDE_x', lon='LONGITUDE_x',
+                     color='COLOR',
                      hover_name='CITYSTATE',
-                     labels={'INC_COUNT': 'Incident Count', 'INSPECTION_SCORE': 'Inspection Score'},
+                     labels={'111_COUNT': 'Building Fire Count', 
+                             'MULTI_INSPECTION_SCORE': 'Multifamily Inspection Score'},
                      title='Inspection Score and Incident Count by City State',
                      scope='usa',
                      size_max=30)  # Add size_max parameter to limit the marker size
+
+fig.update_geos(showcountries=True, countrycolor="Black", showsubunits=True, subunitcolor="Black", subunitwidth=1)
 
 app.layout = dbc.Container([
     dbc.Row([
