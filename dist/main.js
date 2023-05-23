@@ -10,7 +10,7 @@ const menuTitle = document.getElementById('menu-title');
 const menuCards = document.getElementById('menu-cards');
 function generateCardHTML(title, value) {
     return `
-        <div class="max-w-sm rounded-lg overflow-hidden shadow-lg bg-white my-3 transform transition hover:scale-105">
+        <div class="max-w-sm rounded-lg overflow-hidden shadow-lg bg-white my-3">
             <div class="px-6 py-4">
                 <div class="font-semibold text-lg mb-2 text-gray-700">${title}</div>
                 <p class="text-gray-600 text-base">${value}</p>
@@ -65,11 +65,11 @@ fetch('../data/processed/dashboard.json')
             generateCardHTML("Average Injuries (per fire)", item.AVG_INJURIES.toFixed(decimals)),
             generateCardHTML("Average Value of Property Lost (per fire)", dollar_formatter.format(item.AVG_MONEY_LOST)),
             generateCardHTML("Average Alarms Triggered (per fire)", item.AVG_ALARMS.toFixed(decimals)),
+            generateCardHTML("Total Reported Fires (per capita)", handleValue(item.TOTAL_INCIDENT_COUNT_ADJ)),
             generateCardHTML("Reported Cooking Fires (per capita)", handleValue(item.COUNT_113_ADJ)),
             generateCardHTML("Reported Passenger Vehicle Fires (per capita)", handleValue(item.COUNT_131_ADJ)),
             generateCardHTML("Reported Outside Trash/Rubbish/Waste Fires (per capita)", handleValue(item.COUNT_151_ADJ)),
             generateCardHTML("Reported Brush/Grass Fires (per capita)", handleValue(item.COUNT_142_ADJ)),
-            generateCardHTML("Reported Fires (per capita)", handleValue(item.TOTAL_INCIDENT_COUNT_ADJ)),
             generateCardHTML("Population", item.POPULATION),
             generateCardHTML("Total Fires Reported to NFIRS", item.SUPPORT)
         ].join('');
