@@ -14,3 +14,7 @@ data/fire_data.db
 data/opa_properties_public.csv
 multi_merged.csv
 data/
+package.json
+package-lock.json
+tailwind.config.js
+node_modules
