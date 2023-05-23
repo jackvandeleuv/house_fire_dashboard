@@ -24,7 +24,7 @@ function generateCardHTML(title: string, value: string) {
 }
 
 // Fetch data and add it to the map
-fetch('../data/processed/dashboard.json')
+fetch('../dashboard/dashboard.json')
     .then(response => response.json())
     .then(data => {
         for (let item of data) {
