@@ -1,4 +1,4 @@
-declare let L: any;
+import * as L from 'leaflet';
 
 // Initialize your map as before
 const map = L.map('map', {preferCanvas: true, fadeAnimation: false}).setView([37.8, -96], 4);
