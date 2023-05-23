@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Interactive Map</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
+    <link rel="stylesheet" href="dist/style.css">
+    <style>
+        #menu {
+            flex: 1;
+            max-height: calc(100vh - 80px);
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="flex flex-col h-screen">
+        <div class="bg-gray-100 p-4">
+            <h2>Information</h2>
+            <p id="info-content">Click a point on the map to see detailed information.</p>
+        </div>
+        <div class="flex-grow flex">
+            <div id="map" class="w-4/5"></div>
+            <div id="menu" class="w-1/5 bg-gray-200 p-4">
+                <div class="menu-content">
+                    <h3 id="menu-title"></h3>
+                    <div id="menu-cards" class="mt-4 space-y-4">
+                        <!-- Menu cards will be dynamically inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="dist/main.js"></script>
+</body>
+</html>
