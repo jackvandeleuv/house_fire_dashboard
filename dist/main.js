@@ -1,54 +1,22 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const L = __importStar(require("leaflet"));
+import * as L from 'leaflet';
 // Initialize your map as before
-const map = L.map('map', { preferCanvas: true, fadeAnimation: false }).setView([37.8, -96], 4);
+var map = L.map('map', { preferCanvas: true, fadeAnimation: false }).setView([37.8, -96], 4);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
     maxZoom: 18,
 }).addTo(map);
-const menu = document.getElementById('menu');
-const menuTitle = document.getElementById('menu-title');
-const menuCards = document.getElementById('menu-cards');
+var menu = document.getElementById('menu');
+var menuTitle = document.getElementById('menu-title');
+var menuCards = document.getElementById('menu-cards');
 function generateCardHTML(title, value) {
-    return `
-        <div class="max-w-sm rounded-lg overflow-hidden shadow-lg bg-white my-3">
-            <div class="px-6 py-4">
-                <div class="font-semibold text-lg mb-2 text-gray-700">${title}</div>
-                <p class="text-gray-600 text-base">${value}</p>
-            </div>
-        </div>
-    `;
+    return "\n        <div class=\"max-w-sm rounded-lg overflow-hidden shadow-lg bg-white my-3\">\n            <div class=\"px-6 py-4\">\n                <div class=\"font-semibold text-lg mb-2 text-gray-700\">".concat(title, "</div>\n                <p class=\"text-gray-600 text-base\">").concat(value, "</p>\n            </div>\n        </div>\n    ");
 }
 // Fetch data and add it to the map
 fetch('../dashboard/dashboard.json')
-    .then(response => response.json())
-    .then(data => {
-    for (let item of data) {
-        const marker = L.circleMarker([item.LATITUDE, item.LONGITUDE], {
+    .then(function (response) { return response.json(); })
+    .then(function (data) {
+    var _loop_1 = function (item) {
+        var marker = L.circleMarker([item.LATITUDE, item.LONGITUDE], {
             radius: Math.pow(item.POPULATION, 1 / 6),
             fillColor: "#ff7800",
             color: "#000",
@@ -56,23 +24,19 @@ fetch('../dashboard/dashboard.json')
             opacity: 0.5,
             fillOpacity: 0.5,
         }).addTo(map);
-        marker.bindPopup(`<b>${item.CITY}, ${item.STATE}</b><br>Average score: ${item.AVG_SCORE}<br>Fires per capita: ${item.TOTAL_INCIDENT_COUNT_ADJ}`);
+        marker.bindPopup("<b>".concat(item.CITY, ", ").concat(item.STATE, "</b><br>Average score: ").concat(item.AVG_SCORE, "<br>Fires per capita: ").concat(item.TOTAL_INCIDENT_COUNT_ADJ));
         marker.on('mouseover', function () {
             marker.openPopup();
         });
         marker.on('mouseout', function () {
             marker.closePopup();
         });
-        const sidebarMenuTitle = `
-                <span class="text-2xl font-extrabold">${item.CITY}, ${item.STATE}</span>
-                <br>
-                <span class="text-gray-500 text-lg">2013-2019</span>
-            `;
-        const dollar_formatter = new Intl.NumberFormat('en-US', {
+        var sidebarMenuTitle = "\n                <span class=\"text-2xl font-extrabold\">".concat(item.CITY, ", ").concat(item.STATE, "</span>\n                <br>\n                <span class=\"text-gray-500 text-lg\">2013-2019</span>\n            ");
+        var dollar_formatter = new Intl.NumberFormat('en-US', {
             style: 'currency',
             currency: 'USD',
         });
-        const decimals = 5;
+        var decimals = 5;
         function handleValue(value) {
             if (typeof value === 'number') {
                 // Round the number to two decimal places if it's a number
@@ -83,7 +47,7 @@ fetch('../dashboard/dashboard.json')
                 return value;
             }
         }
-        const sidebarMenuCards = [
+        var sidebarMenuCards = [
             generateCardHTML("Average REAC Score", item.AVG_SCORE.toFixed(1)),
             generateCardHTML("Average Additional Buildings Ignited (per fire)", item.AVG_SPREAD.toFixed(decimals)),
             generateCardHTML("Average Fatalities (per fire)", item.AVG_FATALITIES.toFixed(decimals)),
@@ -103,6 +67,10 @@ fetch('../dashboard/dashboard.json')
             menuTitle.innerHTML = sidebarMenuTitle;
             menuCards.innerHTML = sidebarMenuCards;
         });
+    };
+    for (var _i = 0, data_1 = data; _i < data_1.length; _i++) {
+        var item = data_1[_i];
+        _loop_1(item);
     }
 });
 //# sourceMappingURL=main.js.map
