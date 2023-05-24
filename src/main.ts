@@ -23,21 +23,39 @@ function generateCardHTML(title: string, value: string) {
     `;
 }
 
+const decimals = 5;
+
+function handleValue(value: any) {
+    if (typeof value === 'number') {
+        // Round the number to two decimal places if it's a number
+        return value.toFixed(decimals);
+    } else {
+        // If not a number, return the value as it is
+        return value;
+    }
+}
+
 // Fetch data and add it to the map
 fetch('../dashboard/dashboard.json')
     .then(response => response.json())
     .then(data => {
         for (let item of data) {
             const marker = L.circleMarker([item.LATITUDE, item.LONGITUDE], {
-                radius: Math.pow(item.POPULATION, 1/6),
-                fillColor: "#ff7800",
+                radius: Math.pow(item.POPULATION, 1/5),
+                fillColor: "#FF2E00",
                 color: "#000",
                 weight: 1,
-                opacity: 0.5,
-                fillOpacity: 0.5,
+                opacity: item.TOTAL_INCIDENT_COUNT_ADJ,
+                fillOpacity: item.TOTAL_INCIDENT_COUNT_ADJ,
             }).addTo(map);
 
-            marker.bindPopup(`<b>${item.CITY}, ${item.STATE}</b><br>Average score: ${item.AVG_SCORE}<br>Fires per capita: ${item.TOTAL_INCIDENT_COUNT_ADJ}`);
+            marker.bindPopup(`
+                <b>${item.CITY}, ${item.STATE}</b>
+                <br>
+                Average REAC score: ${item.AVG_SCORE.toFixed(1)}
+                <br>
+                Total Reported Fires (per capita): ${handleValue(item.TOTAL_INCIDENT_COUNT_ADJ)}
+            `);
 
             marker.on('mouseover', function () {
                 marker.openPopup();
@@ -56,18 +74,6 @@ fetch('../dashboard/dashboard.json')
                 style: 'currency',
                 currency: 'USD',
               });
-
-            const decimals = 5;
-
-            function handleValue(value: any) {
-                if (typeof value === 'number') {
-                    // Round the number to two decimal places if it's a number
-                    return value.toFixed(decimals);
-                } else {
-                    // If not a number, return the value as it is
-                    return value;
-                }
-            }
                       
             const sidebarMenuCards = [
                 generateCardHTML("Average REAC Score", item.AVG_SCORE.toFixed(1)),
