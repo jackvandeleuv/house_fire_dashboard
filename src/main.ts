@@ -23,21 +23,46 @@ function generateCardHTML(title: string, value: string) {
     `;
 }
 
+const decimals = 5;
+
+function handleValue(value: any) {
+    if (typeof value === 'number') {
+        // Round the number to two decimal places if it's a number
+        return value.toFixed(decimals);
+    } else {
+        // If not a number, return the value as it is
+        return value;
+    }
+}
+
 // Fetch data and add it to the map
 fetch('../dashboard/dashboard.json')
     .then(response => response.json())
     .then(data => {
         for (let item of data) {
+            let avgScoreMultifamily: string = item.AVG_SCORE_MULTIFAMILY?.toFixed(1)?.toString() ?? 'N/A';
+            let avgScorePublic: string = item.AVG_SCORE_PUBLIC?.toFixed(1)?.toString() ?? 'N/A';
+            
             const marker = L.circleMarker([item.LATITUDE, item.LONGITUDE], {
                 radius: Math.pow(item.POPULATION, 1/6),
-                fillColor: "#ff7800",
+                fillColor: "#FF2E00",
                 color: "#000",
                 weight: 1,
-                opacity: 0.5,
-                fillOpacity: 0.5,
+                opacity: .5,
+                fillOpacity: .5,
             }).addTo(map);
 
-            marker.bindPopup(`<b>${item.CITY}, ${item.STATE}</b><br>Average score: ${item.AVG_SCORE}<br>Fires per capita: ${item.TOTAL_INCIDENT_COUNT_ADJ}`);
+            marker.bindPopup(`
+                <b>${item.CITY}, ${item.STATE}</b>
+                <br>
+                Average Inspection Score (Multifamily): ${avgScoreMultifamily}
+                <br>
+                Average Inspection Score (Public): ${avgScorePublic}
+                <br>
+                Average Fatalities (per fire): ${handleValue(item.AVG_FATALITIES)}
+                <br>
+                Total Reported Fires (per capita): ${handleValue(item.TOTAL_INCIDENT_COUNT_ADJ)}
+            `);
 
             marker.on('mouseover', function () {
                 marker.openPopup();
@@ -56,21 +81,10 @@ fetch('../dashboard/dashboard.json')
                 style: 'currency',
                 currency: 'USD',
               });
-
-            const decimals = 5;
-
-            function handleValue(value: any) {
-                if (typeof value === 'number') {
-                    // Round the number to two decimal places if it's a number
-                    return value.toFixed(decimals);
-                } else {
-                    // If not a number, return the value as it is
-                    return value;
-                }
-            }
                       
             const sidebarMenuCards = [
-                generateCardHTML("Average REAC Score", item.AVG_SCORE.toFixed(1)),
+                generateCardHTML("Average Multifamily Inspection Score", avgScoreMultifamily),
+                generateCardHTML("Average Public Inspection Score", avgScorePublic),
                 generateCardHTML("Average Additional Buildings Ignited (per fire)", item.AVG_SPREAD.toFixed(decimals)),
                 generateCardHTML("Average Fatalities (per fire)", item.AVG_FATALITIES.toFixed(decimals)),
                 generateCardHTML("Average Injuries (per fire)", item.AVG_INJURIES.toFixed(decimals)),
