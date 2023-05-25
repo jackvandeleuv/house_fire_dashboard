@@ -36,7 +36,7 @@ function handleValue(value: any) {
 }
 
 // Fetch data and add it to the map
-fetch('/house_fires_dashboard/dashboard/dashboard.json')
+fetch('/house_fire_dashboard/dashboard/dashboard.json')
     .then(response => response.json())
     .then(data => {
         for (let item of data) {
