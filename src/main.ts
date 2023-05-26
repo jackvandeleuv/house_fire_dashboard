@@ -34,9 +34,11 @@ function handleValue(value: any) {
         return value;
     }
 }
+const url = window.location.origin + '/dashboard/dashboard.json';
+console.log('The URL to the JSON file is:', url);
 
 // Fetch data and add it to the map
-fetch('https://jackvandeleuv.github.io/house_fire_dashboard/dashboard/dashboard.json')
+fetch('./dashboard/dashboard.json')
     .then(response => response.json())
     .then(data => {
         for (let item of data) {
