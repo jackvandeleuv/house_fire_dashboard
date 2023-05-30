@@ -1,16 +1,56 @@
 import * as L from 'leaflet';
 
-// Initialize your map as before
-const map = L.map('map', {preferCanvas: true, fadeAnimation: false}).setView([37.8, -96], 4);
+// Short and long decimals to round numbers to.
+const S_DECIMALS = 1
+const L_DECIMALS = 4
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
-    maxZoom: 18,
-}).addTo(map);
+interface City {
+    CITYSTATE: string;
+    LATITUDE: number;
+    LONGITUDE: number;
+    AVG_SCORE_MULTIFAMILY: number;
+    AVG_SCORE_PUBLIC: number;
+    AVG_SPREAD: number;
+    AVG_MONEY_LOST: number;
+    AVG_FATALITIES: number;
+    AVG_INJURIES: number;
+    AVG_ALARMS: number;
+    SUPPORT: number;
+    SUMLEV: number;
+    STATE: string;
+    COUNTY: number;
+    PLACE: number;
+    COUSUB: number;
+    CONCIT: number;
+    PRIMGEO_FLAG: number;
+    FUNCSTAT: string;
+    NAME: string;
+    STNAME: string;
+    POPULATION: number;
+    POPESTIMATE2020: number;
+    POPESTIMATE2021: number;
+    TYPE: string;
+    COUNT_111_ADJ: number;
+    COUNT_113_ADJ: number;
+    COUNT_131_ADJ: number;
+    COUNT_151_ADJ: number;
+    COUNT_142_ADJ: number;
+    TOTAL_INCIDENT_COUNT_ADJ: number;
+    CITY: string;
+  }
 
-const menu = document.getElementById('menu');
-const menuTitle = document.getElementById('menu-title');
-const menuCards = document.getElementById('menu-cards');
+function renderMap(): L.Map {
+    // Initialize the map
+    const map = L
+        .map('map', {preferCanvas: true, fadeAnimation: false})
+        .setView([37.8, -96], 4);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+        maxZoom: 18,
+    }).addTo(map);
+    return map;
+}
 
 function generateCardHTML(title: string, value: string) {
     return `
@@ -19,51 +59,82 @@ function generateCardHTML(title: string, value: string) {
                 <div class="font-semibold text-lg mb-2 text-gray-700">${title}</div>
                 <p class="text-gray-600 text-base">${value}</p>
             </div>
-        </div>
-    `;
+        </div>`;
 }
 
-const decimals = 5;
-
-function handleValue(value: any) {
-    if (typeof value === 'number') {
-        // Round the number to two decimal places if it's a number
-        return value.toFixed(decimals);
-    } else {
-        // If not a number, return the value as it is
-        return value;
-    }
+function generateCitySummary(city: City): string {
+    return [
+        generateCardHTML("Average Multifamily Inspection Score", formatNumbers(city.AVG_SCORE_MULTIFAMILY, S_DECIMALS)),
+        generateCardHTML("Average Public Inspection Score", formatNumbers(city.AVG_SCORE_PUBLIC, S_DECIMALS)),
+        generateCardHTML("Average Buildings/Vehicles/Entities Ignited (per fire)", formatNumbers(city.AVG_SPREAD, L_DECIMALS)),
+        generateCardHTML("Average Fatalities (per fire)", formatNumbers(city.AVG_FATALITIES, L_DECIMALS)),
+        generateCardHTML("Average Injuries (per fire)", formatNumbers(city.AVG_INJURIES, L_DECIMALS)),
+        generateCardHTML("Average Value of Property Lost (per fire)", dollar_formatter.format(city.AVG_MONEY_LOST)),
+        generateCardHTML("Average Alarms Triggered (per fire)", formatNumbers(city.AVG_ALARMS, L_DECIMALS)),
+        generateCardHTML("Total Reported Fires (per capita)", formatNumbers(city.TOTAL_INCIDENT_COUNT_ADJ, L_DECIMALS)),
+        generateCardHTML("Reported Cooking Fires (per capita)", formatNumbers(city.COUNT_113_ADJ, L_DECIMALS)),
+        generateCardHTML("Reported Passenger Vehicle Fires (per capita)", formatNumbers(city.COUNT_131_ADJ, L_DECIMALS)),
+        generateCardHTML("Reported Outside Trash/Rubbish/Waste Fires (per capita)", formatNumbers(city.COUNT_151_ADJ, L_DECIMALS)),
+        generateCardHTML("Reported Brush/Grass Fires (per capita)", formatNumbers(city.COUNT_142_ADJ, L_DECIMALS)),
+        generateCardHTML("Population", city.POPULATION.toString()),
+        generateCardHTML("Total Fires Reported to NFIRS", city.SUPPORT.toString())
+    ].join('');
 }
-const url = window.location.origin + '/dashboard/dashboard.json';
-console.log('The URL to the JSON file is:', url);
 
-// Fetch data and add it to the map
-fetch('./dashboard/dashboard.json')
+function formatNumbers(value: string | number, round_to: number): string {
+    if (value == null) return 'N/A';
+    if (typeof value === 'number') return value.toFixed(round_to).toString();
+    return value;
+}
+
+const dollar_formatter = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  });
+
+function renderPage(): void {
+    const map: L.Map = renderMap();
+
+    fetch('./dashboard/dashboard.json')
     .then(response => response.json())
-    .then(data => {
-        for (let item of data) {
-            let avgScoreMultifamily: string = item.AVG_SCORE_MULTIFAMILY?.toFixed(1)?.toString() ?? 'N/A';
-            let avgScorePublic: string = item.AVG_SCORE_PUBLIC?.toFixed(1)?.toString() ?? 'N/A';
-            
-            const marker = L.circleMarker([item.LATITUDE, item.LONGITUDE], {
-                radius: Math.pow(item.POPULATION, 1/6),
+    .then((data: City[]) => {
+        for (let city of data) {           
+            const marker = L.circleMarker([city.LATITUDE, city.LONGITUDE], {
+                radius: Math.pow(city.POPULATION, 1/(3.5)) / 4,
                 fillColor: "#FF2E00",
                 color: "#000",
                 weight: 1,
-                opacity: .5,
-                fillOpacity: .5,
+                opacity: .35,
+                fillOpacity: .35,
             }).addTo(map);
 
+            const sidebarMenuTitle = `
+                <span class="text-2xl font-extrabold">${city.CITY}, ${city.STATE}</span>
+                <br>
+                <span class="text-gray-500 text-lg">2013-2019</span>
+            `;
+                      
+            const sidebarMenuCards = generateCitySummary(city);
+            const menu = document.getElementById('menu');
+            const menuTitle = document.getElementById('menu-title');
+            const menuCards = document.getElementById('menu-cards');
+
+            marker.on('click', function () {
+                menu!.style.display = 'block';
+                menuTitle!.innerHTML = sidebarMenuTitle
+                menuCards!.innerHTML = sidebarMenuCards;
+            });
+
             marker.bindPopup(`
-                <b>${item.CITY}, ${item.STATE}</b>
+                <b>${city.CITY}, ${city.STATE}</b>
                 <br>
-                Average Inspection Score (Multifamily): ${avgScoreMultifamily}
+                Average Inspection Score (Multifamily): ${formatNumbers(city.AVG_SCORE_MULTIFAMILY, S_DECIMALS)}
                 <br>
-                Average Inspection Score (Public): ${avgScorePublic}
+                Average Inspection Score (Public): ${formatNumbers(city.AVG_SCORE_PUBLIC, S_DECIMALS)}
                 <br>
-                Average Fatalities (per fire): ${handleValue(item.AVG_FATALITIES)}
+                Average Fatalities (per fire): ${formatNumbers(city.AVG_FATALITIES, L_DECIMALS)}
                 <br>
-                Total Reported Fires (per capita): ${handleValue(item.TOTAL_INCIDENT_COUNT_ADJ)}
+                Total Reported Fires (per capita): ${formatNumbers(city.TOTAL_INCIDENT_COUNT_ADJ, L_DECIMALS)}
             `);
 
             marker.on('mouseover', function () {
@@ -72,40 +143,8 @@ fetch('./dashboard/dashboard.json')
             marker.on('mouseout', function () {
                 marker.closePopup();
             });
-
-            const sidebarMenuTitle = `
-                <span class="text-2xl font-extrabold">${item.CITY}, ${item.STATE}</span>
-                <br>
-                <span class="text-gray-500 text-lg">2013-2019</span>
-            `;
-        
-            const dollar_formatter = new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: 'USD',
-              });
-                      
-            const sidebarMenuCards = [
-                generateCardHTML("Average Multifamily Inspection Score", avgScoreMultifamily),
-                generateCardHTML("Average Public Inspection Score", avgScorePublic),
-                generateCardHTML("Additional Fires Caused by Each Initial Fire", item.AVG_SPREAD.toFixed(decimals)),
-                generateCardHTML("Average Fatalities (per fire)", item.AVG_FATALITIES.toFixed(decimals)),
-                generateCardHTML("Average Injuries (per fire)", item.AVG_INJURIES.toFixed(decimals)),
-                generateCardHTML("Average Value of Property Lost (per fire)", dollar_formatter.format(item.AVG_MONEY_LOST)),
-                generateCardHTML("Average Alarms Triggered (per fire)", item.AVG_ALARMS.toFixed(decimals)),
-                generateCardHTML("Total Reported Fires (per capita)", handleValue(item.TOTAL_INCIDENT_COUNT_ADJ)),
-                generateCardHTML("Reported Cooking Fires (per capita)", handleValue(item.COUNT_113_ADJ)),
-                generateCardHTML("Reported Passenger Vehicle Fires (per capita)", handleValue(item.COUNT_131_ADJ)),
-                generateCardHTML("Reported Outside Trash/Rubbish/Waste Fires (per capita)", handleValue(item.COUNT_151_ADJ)),
-                generateCardHTML("Reported Brush/Grass Fires (per capita)", handleValue(item.COUNT_142_ADJ)),
-                generateCardHTML("Population", item.POPULATION),
-                generateCardHTML("Total Fires Reported to NFIRS", item.SUPPORT)
-              ].join('');
-              
-            
-            marker.on('click', function () {
-                menu!.style.display = 'block';
-                menuTitle!.innerHTML = sidebarMenuTitle
-                menuCards!.innerHTML = sidebarMenuCards;
-            });
         }
     });
+}
+
+renderPage();
