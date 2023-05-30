@@ -87,7 +87,7 @@ fetch('./dashboard/dashboard.json')
             const sidebarMenuCards = [
                 generateCardHTML("Average Multifamily Inspection Score", avgScoreMultifamily),
                 generateCardHTML("Average Public Inspection Score", avgScorePublic),
-                generateCardHTML("Average Additional Buildings Ignited (per fire)", item.AVG_SPREAD.toFixed(decimals)),
+                generateCardHTML("Additional Fires Caused by Each Initial Fire", item.AVG_SPREAD.toFixed(decimals)),
                 generateCardHTML("Average Fatalities (per fire)", item.AVG_FATALITIES.toFixed(decimals)),
                 generateCardHTML("Average Injuries (per fire)", item.AVG_INJURIES.toFixed(decimals)),
                 generateCardHTML("Average Value of Property Lost (per fire)", dollar_formatter.format(item.AVG_MONEY_LOST)),
