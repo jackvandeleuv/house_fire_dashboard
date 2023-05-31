@@ -14,8 +14,6 @@ interface City {
     AVG_MONEY_LOST: number;
     AVG_FATALITIES: number;
     AVG_INJURIES: number;
-    AVG_ALARMS: number;
-    SUPPORT: number;
     CITY: string;
     STATE: string;
     POPULATION: number;
@@ -32,9 +30,7 @@ interface City {
     AVG_MONEY_LOST_PERCENTILE: number;
     AVG_FATALITIES_PERCENTILE: number;
     AVG_INJURIES_PERCENTILE: number;
-    AVG_ALARMS_PERCENTILE: number;
     POPULATION_PERCENTILE: number;
-    SUPPORT_PERCENTILE: number,
     COUNT_111_ADJ_PERCENTILE: number;
     COUNT_113_ADJ_PERCENTILE: number;
     COUNT_131_ADJ_PERCENTILE: number;
@@ -102,10 +98,6 @@ function generateCitySummary(city: City): string {
             dollar_formatter.format(city.AVG_MONEY_LOST),
             formatPercentile(city.AVG_MONEY_LOST_PERCENTILE)
         ),
-        generateCardHTML("Average Alarms Triggered (per fire)",
-            formatNumbers(city.AVG_ALARMS, L_DECIMALS),
-            formatPercentile(city.AVG_ALARMS_PERCENTILE)
-        ),
         generateCardHTML("Total Reported Fires (per capita)",
             formatNumbers(city.TOTAL_INCIDENT_COUNT_ADJ, L_DECIMALS),
             formatPercentile(city.TOTAL_INCIDENT_COUNT_ADJ_PERCENTILE)
@@ -129,10 +121,6 @@ function generateCitySummary(city: City): string {
         generateCardHTML("Population",
             city.POPULATION.toLocaleString(),
             formatPercentile(city.POPULATION_PERCENTILE)
-        ),
-        generateCardHTML("Total Fires Reported to NFIRS",
-            city.SUPPORT.toLocaleString(),
-            formatPercentile(city.SUPPORT_PERCENTILE)
         )
     ].join('');
 }
