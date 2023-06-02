@@ -37,6 +37,8 @@ interface City {
     COUNT_151_ADJ_PERCENTILE: number;
     COUNT_142_ADJ_PERCENTILE: number;
     TOTAL_INCIDENT_COUNT_ADJ_PERCENTILE: number;
+    SUPPORT: number;
+    SUPPORT_PERCENTILE: number;
 }
   
 
@@ -82,7 +84,7 @@ function generateCitySummary(city: City): string {
             formatNumbers(city.AVG_SCORE_PUBLIC, S_DECIMALS),
             formatPercentile(city.AVG_SCORE_PUBLIC_PERCENTILE)
         ),
-        generateCardHTML("Average Buildings/Vehicles/Etc. Ignited (per fire)",
+        generateCardHTML("Average Secondary Fires Ignited (per fire)",
             formatNumbers(city.AVG_SPREAD, L_DECIMALS),
             formatPercentile(city.AVG_SPREAD_PERCENTILE)
         ),
@@ -121,6 +123,10 @@ function generateCitySummary(city: City): string {
         generateCardHTML("Population",
             city.POPULATION.toLocaleString(),
             formatPercentile(city.POPULATION_PERCENTILE)
+        ),
+        generateCardHTML("Total Fires Reported to NFIRS",
+            city.SUPPORT.toLocaleString(),
+            formatPercentile(city.SUPPORT_PERCENTILE)
         )
     ].join('');
 }
@@ -160,7 +166,7 @@ function renderPage(): void {
             const sidebarMenuTitle = `
                 <span class="text-2xl font-extrabold">${city.CITY}, ${city.STATE}</span>
                 <br>
-                <span class="text-gray-500 text-lg">2013-2019</span>
+                <span class="text-gray-500 text-lg">2013-2018</span>
             `;
                       
             const sidebarMenuCards = generateCitySummary(city);
