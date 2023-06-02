@@ -1,7 +1,7 @@
 const path = require('path');
 
 module.exports = {
-  mode: 'production',
+  mode: 'development',
   entry: './src/main.ts',
   module: {
     rules: [
@@ -21,4 +21,8 @@ module.exports = {
     publicPath: '/house_fire_dashboard/',
     libraryTarget: 'umd',
   },
+  watch: true,
+  watchOptions: {
+    ignored: /node_modules/,
+  }
 };
