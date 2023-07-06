@@ -18,3 +18,6 @@ package.json
 package-lock.json
 tailwind.config.js
 node_modules
+cache/
+scratch.ipynb
+Sessions_Park Entrance and Tree Cover Map.json
