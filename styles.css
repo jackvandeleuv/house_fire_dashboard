@@ -1,9 +1,0 @@
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
-
-/* Add border and padding to each menu card */
-.card {
-    border: 1px solid #e2e8f0;
-    padding: 1rem;
-}
